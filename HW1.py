@@ -1,36 +1,39 @@
-cook_book = {}
 
+def cooking_book(file_name):
+    with open(file_name) as file_work:
 
-def cooking_book():
-    with open('recipes.txt') as f:
-        for line in f:
-            if '|' not in line and line != '':
-                dish = line.strip()
-                cook_book[dish] = []
-            else:
-                new_doc = dict(ingredient_name=line.split(' | ')[0],
-                               quantity=line.split(' | ')[1],
-                               measure=line.split(' | ')[2].strip())
-                cook_book[dish].append(new_doc)
-    print(cook_book)
+        for line in file_work:
+            dish_name = line.strip()
+            # print(line.strip())
+            counter = int(file_work.readline().strip())
+            list_of_ingridient = []
+
+            for i in range(counter):
+                string = file_work.readline().strip().split(sep=' | ')
+                # print(string)
+                temp_dict = dict(ingredient_name=string[0], quantity=string[1], measure=string[2])
+                list_of_ingridient.append(temp_dict)
+                cook_book[dish_name] = list_of_ingridient
+
+            file_work.readline()
+
+    return cook_book
 
 
 def get_shop_list_by_dishes(dishes, person):
-    for x in dishes:
-        new_order(x, person)
+    shop_list = {}
+
+    for dish in dishes:
+        for ingridient in cook_book[dish]:
+            if shop_list.get(ingridient['ingredient_name']) is None:
+                shop_list[ingridient['ingredient_name']] = {'measure': ingridient['measure'],
+                                                            'quantity': int(ingridient['quantity']) * person}
+            else:
+                shop_list[ingridient['ingredient_name']]['quantity'] += int(ingridient['quantity']) * person
+
+    return shop_list
 
 
-def new_order(order, person):
-    orders = {}
-    for dish, ingredients in cook_book.items():
-        if order == dish:
-            orders[dish] = ingredients
-            for i in ingredients:
-                for quantity, count in i.items():
-                    if 'quantity' == quantity:
-                        i[quantity] = int(count) * person
-    print(orders)
-
-
-cooking_book()
-get_shop_list_by_dishes(['Омлет', 'Фахитос'], 3)
+cook_book = {}
+print(cooking_book('recipes.txt'))
+print(get_shop_list_by_dishes(['Омлет', 'Фахитос'], 3))
